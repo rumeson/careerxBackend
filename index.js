@@ -159,20 +159,24 @@ app.patch('/update-email', async (req, res) => {
 
 // ADD USERS ARRAY API ASSIGNMENT
 app.post('/add-users', (req, res) => {
-  const users = req.body
+  try {
+    const users = req.body
 
-  users.forEach(async (user, index) => {
-    const { name, email, age } = user
-    if (Number(age) < 18 || Number(age) > 99) {
-      return res
-        .status(400)
-        .json({ message: 'Must be between 18 and 99 years' })
-    }
-    const newUser = new Users({ name, email, age })
-    await newUser.save()
-    console.log(user, index)
-  })
-  res.status(200).json({ message: `Users added Successfully` })
+    users.forEach(async (user, index) => {
+      const { name, email, age } = user
+      if (Number(age) < 18 || Number(age) > 99) {
+        return res
+          .status(400)
+          .json({ message: 'Must be between 18 and 99 years' })
+      }
+      const newUser = new Users({ name, email, age })
+      await newUser.save()
+      console.log(user, index)
+    })
+    res.status(200).json({ message: `Users added Successfully` })
+  } catch (error) {
+    res.status(400).json({ message: error })
+  }
 })
 
 // DEFAULT API
