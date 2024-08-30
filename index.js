@@ -117,7 +117,8 @@ app.get('/students', async (req, res) => {
   })
 })
 
-app.post('/add_user', async (req, res) => {
+// ADD USER API ASSIGNMENT
+app.post('/add-user', async (req, res) => {
   const { name, email, age } = req.body
 
   if (!name || name.length < 3) {
@@ -136,7 +137,43 @@ app.post('/add_user', async (req, res) => {
     .json({ message: 'User Registration Successful', newUser })
 })
 
-app.patch('/updateEmail', async (req, res) => {})
+// UPDATE EMAIL API ASSIGNMENT
+app.patch('/update-email', async (req, res) => {
+  const { name, email } = req.body
+  const emailRegexp =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+
+  if (!email) {
+    return res.status(400).json({ message: 'Please add your email' })
+  }
+
+  if (!emailRegexp.test(email)) {
+    return res.status(400).json({ message: 'Please provide a valid email' })
+  }
+  const updateEmail = await Users.findOneAndUpdate({ name }, req.body)
+  if (!updateEmail) {
+    return res.status(400).json({ message: `No user with name: ${name}` })
+  }
+  res.status(200).json({ updateEmail })
+})
+
+// ADD USERS ARRAY API ASSIGNMENT
+app.post('/add-users', (req, res) => {
+  const users = req.body
+
+  users.forEach(async (user, index) => {
+    const { name, email, age } = user
+    if (Number(age) < 18 || Number(age) > 99) {
+      return res
+        .status(400)
+        .json({ message: 'Must be between 18 and 99 years' })
+    }
+    const newUser = new Users({ name, email, age })
+    await newUser.save()
+    console.log(user, index)
+  })
+  res.status(200).json({ message: `Users added Successfully` })
+})
 
 // DEFAULT API
 app.use((req, res) => {
